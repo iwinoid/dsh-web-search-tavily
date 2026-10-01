@@ -7,12 +7,10 @@
  * misspelled event types or malformed payloads fail at compile time.
  *
  * NOTE: this merge is type-level only. The core `KNOWN_SESSION_EVENT_TYPES`
- * list is generated from in-repo packages (`scripts/gen-persistence-catalog.ts`)
- * and never includes out-of-repo types by construction — see
- * `docs/persistence-catalog.md`. A first-party reader still refuses these
- * events unless the envelope carries `ignorable: true`, and the current
- * `Session.append` offers no such parameter, so the plugin keeps
- * `recordToSession` OFF by default (see README).
+ * set is built from first-party packages and never includes out-of-repo
+ * types, so `web/tavily-*` events stay opaque to first-party readers.
+ * DSH 0.2.0's `Session.append` carries no `ignorable` envelope marker,
+ * so the plugin keeps `recordToSession` OFF by default (see README).
  */
 export declare const TAVILY_PROVIDER_ID = "tavily";
 export declare const TAVILY_DEFAULT_BASE_URL = "https://api.tavily.com";

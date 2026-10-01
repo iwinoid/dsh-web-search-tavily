@@ -42,7 +42,7 @@ usable providers with no pin → `WEB_PROVIDER_AMBIGUOUS`.
 | `baseURL` | `https://api.tavily.com` | `$TAVILY_BASE_URL` overrides when set. `/search` is appended. |
 | `searchDepth` / `topic` | `basic` / `general` | Passed through to Tavily. |
 | `maxResults` | `8` | 1–20. The seam additionally caps `sources[]` to `request.maxResults`. |
-| `recordToSession` | `false` | See below. Keep OFF unless the harness supports ignorable session writes. |
+| `recordToSession` | `false` | See below. Writes opaque out-of-repo event types; keep OFF unless you accept them in the log. |
 
 ## Session audit trail (`recordToSession`, default OFF)
 
@@ -53,17 +53,13 @@ When ON, each search appends two log-only events (payloads in
 - `web/tavily-search-request` — secret-free endpoint + body, before dispatch.
 - `web/tavily-search-usage` — `{ credits }` block echoed by Tavily, after success.
 
-The merge is type-level only: the core `KNOWN_SESSION_EVENT_TYPES` list is
-generated from in-repo packages (`scripts/gen-persistence-catalog.ts`, see
-`docs/persistence-catalog.md`) and never contains out-of-repo types by
-construction. A first-party reader refuses such logs
-(`SessionFormatUnsupportedError`) unless the envelope carries
-`ignorable: true`, and the `Session.append` shipped with this harness accepts
-no such parameter (`packages/core/session/src/index.ts`). The plugin passes
-`{ ignorable: true }` for forward compatibility, but on current harnesses the
-flag is dropped — so **default OFF is the only setting that cannot poison
-history**. Rationale:
-`.agents/notes/implemented/architecture/2026-08-10-session-log-version-mechanism.md`.
+The merge is type-level only: the core `KNOWN_SESSION_EVENT_TYPES` set is
+built from first-party packages and never contains out-of-repo types, so
+`web/tavily-*` events stay opaque to first-party readers. DSH 0.2.0's
+`Session.append(type, data, …surfaceOpts)` carries no `ignorable` envelope
+marker — opt-in writes are plain appends — so **default OFF is the only
+setting that keeps third-party session tooling from ever seeing unknown
+event types**.
 
 ## Tests
 
