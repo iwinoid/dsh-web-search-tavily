@@ -1,0 +1,9 @@
+- insert:
+    - id: web-search-tavily
+      name: 'dsh-web-search-tavily'
+      config:
+        apiKeyEnv: TAVILY_API_KEY
+        baseURL: !!js process.env.TAVILY_BASE_URL || "https://api.tavily.com"
+        searchDepth: basic
+        maxResults: 8
+        recordToSession: false
